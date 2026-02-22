@@ -377,6 +377,7 @@ def blackjack():
 
     stand = True
     playerStand = False
+    playerCardHit = False
 
     roundOver = "yes"
     solveMoney = "no"
