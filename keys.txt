@@ -1,0 +1,8 @@
+B back
+Z deal
+H hit
+S stand
+C call
+K check
+R raise
+F fold
