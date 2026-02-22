@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Panel</title>
+</head>
+<body>
+    <h1>Debug Panel</h1>
+    <p>This is a debug panel for development purposes.</p>
+    <h2>State</h2>
+    <code id="state"></code>
+    <h2>Actions</h2>
+    {% for action in actions %}
+        <button onclick="dispatchAction('{{ action }}')">{{ action }}</button>
+    {% endfor %}
+
+    <h2>Settings</h2>
+    <label for="updateInterval">Update Interval (ms): </label>
+    <input type="number" id="updateInterval" placeholder="Update Interval" value="1000">
+
+    <input type="checkbox" id="updateAfterAction" checked>
+    <label for="updateAfterAction">Update after action</label>
+
+    <script>
+        function fetchState() {
+            fetch('/get_state')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('state').textContent = JSON.stringify(data, null, 2);
+                });
+        }
+
+        function dispatchAction(action) {
+            fetch('/send_command/' + action);
+            if (document.getElementById('updateAfterAction').checked) {
+                fetchState();
+            }
+        }
+
+        // Fetch state based on the update interval
+        var updateIntervalInput = document.getElementById('updateInterval');
+
+        let interval = setInterval(fetchState, parseInt(updateIntervalInput.value));
+
+        updateIntervalInput.addEventListener('change', function() {
+            clearInterval(interval);
+            interval = setInterval(fetchState, parseInt(updateIntervalInput.value));
+        });
+    </script>
+</body>
+</html>

@@ -7,7 +7,7 @@ import pygame
 import time
 import random
 
-from flask import Flask
+from flask import Flask, render_template
 
 # Initialise Flask
 webapp = Flask(__name__)
@@ -366,7 +366,7 @@ def menu():
         pygame.display.update()
         clock.tick(15)
 
-###############################################################################   
+###############################################################################
 
 ###############################################################################
 def blackjack():
@@ -874,6 +874,41 @@ def poker():
 @webapp.route("/")
 def web_index():
     return "IT WORKS!"
+
+@webapp.route("/get_state")
+def get_state():
+    with game_state_lock:
+        return game_state
+
+@webapp.route("/send_command/<command>")
+def send_command(command):
+    """
+    Send a command from Flask to Pygame by putting it in the queue.
+    :param command: The command to send, as a string that matches an EventType value.
+    :return: None
+    """
+    try:
+        event_type = EventType(command)
+        to_pygame_queue.put(event_type.value)
+        return {
+            "status": "success",
+            "message": f"Command '{command}' sent to Pygame."
+        }
+    except ValueError:
+        # If the command isn't a valid EventType, ignore it and send back an error message
+        return {
+            "status": "error",
+            "message": f"Invalid command '{command}'. Must be one of {[e.value for e in EventType]}."
+        }, 400
+
+@webapp.route("/debug_panel")
+def debug_panel():
+    """
+    Renders a simple debug panel that shows the current game state and allows sending commands to Pygame.
+    :return: A simple HTML page with the debug panel.
+    """
+    actions = [e.value for e in EventType]
+    return render_template("debug_panel.html", actions=actions)
 
 ################################################################################
 
