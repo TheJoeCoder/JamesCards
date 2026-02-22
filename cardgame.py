@@ -14,35 +14,34 @@ from flask import Flask, render_template
 webapp = Flask(__name__)
 
 # Queues for communication between threads
-to_pygame_queue = queue.Queue() # For sending commands from Flask to Pygame
+to_pygame_queue = queue.Queue()  # For sending commands from Flask to Pygame
 
 # Game state variable used by flask
 game_state = {
     "game": "none",
 }
-game_state_lock = threading.Lock() # so that only one thread can access game_state at a time
+game_state_lock = threading.Lock()  # so that only one thread can access game_state at a time
 
 # Game variables
 fullScreen = False
 
-
-black = (0,0,0)
-white = (255,255,255)
+black = (0, 0, 0)
+white = (255, 255, 255)
 
 light_purple = (200, 150, 255)
 purple = (110, 40, 125)
-background_colour = (34,139,34)
-grey = (220,220,220)
+background_colour = (34, 139, 34)
+grey = (220, 220, 220)
 green = (0, 200, 0)
-red = (255,0,0)
-light_slat = (119,136,153)
+red = (255, 0, 0)
+light_slat = (119, 136, 153)
 dark_slat = (47, 79, 79)
 dark_red = (255, 0, 0)
 
 blue = (0, 0, 175)
 
-bright_red = (255,0,0)
-bright_green = (0,255,0)
+bright_red = (255, 0, 0)
+bright_green = (0, 255, 0)
 
 block_color = background_colour
 
@@ -59,48 +58,50 @@ pot = 0
 display_width = 240
 display_height = 280
 
-
-
 cardBack = "cards/Back.png"
 cardDict = json.load(open("cards.json"))
+
 
 def text_objects(text, font):
     textSurface = font.render(text, True, black)
     return textSurface, textSurface.get_rect()
 
-def button(msg,x,y,w,h,ic,ac,action=None):
+
+def button(msg, x, y, w, h, ic, ac, action=None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
     # print(click)
 
-    if x+w > mouse[0] > x and y+h > mouse[1] > y:
-        pygame.draw.rect(gameDisplay, ac, (x,y,w,h))
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
 
         if click[0] == 1 and action is not None:
             action()
     else:
-        pygame.draw.rect(gameDisplay, ic, (x,y,w,h))
+        pygame.draw.rect(gameDisplay, ic, (x, y, w, h))
 
-    smallText = pygame.font.SysFont("Times New Roman",35)
+    smallText = pygame.font.SysFont("Times New Roman", 35)
     textSurf, textRect = text_objects(msg, smallText)
-    textRect.center = ( (x+(w/2)), (y+(h/2)) )
+    textRect.center = ((x + (w / 2)), (y + (h / 2)))
     gameDisplay.blit(textSurf, textRect)
 
-    if x+w > mouse[0] > x and y+h > mouse[1] > y:
-        pygame.draw.rect(gameDisplay, ac,(x,y,w,h))
+    if x + w > mouse[0] > x and y + h > mouse[1] > y:
+        pygame.draw.rect(gameDisplay, ac, (x, y, w, h))
     else:
-        pygame.draw.rect(gameDisplay,ic,(x, y, w, h))
+        pygame.draw.rect(gameDisplay, ic, (x, y, w, h))
 
-    smallText = pygame.font.SysFont("Times New Roman",15)
+    smallText = pygame.font.SysFont("Times New Roman", 15)
     textSurf, textRect = text_objects(msg, smallText)
-    textRect.center = ( (x+(w/2)), (y+(h/2)) )
+    textRect.center = ((x + (w / 2)), (y + (h / 2)))
     gameDisplay.blit(textSurf, textRect)
+
 
 def smalltext(f, msg, x, y, w, h):
-    smallText = pygame.font.SysFont("Times New Roman",f)
+    smallText = pygame.font.SysFont("Times New Roman", f)
     textSurf, textRect = text_objects(msg, smallText)
-    textRect.center = ( (x+(w/2)), (y+(h/2)) )
+    textRect.center = ((x + (w / 2)), (y + (h / 2)))
     gameDisplay.blit(textSurf, textRect)
+
 
 ################################################################################
 
@@ -122,6 +123,7 @@ class EventType(enum.Enum):
     CHECK = "check"
     RAISE = "raise"
     FOLD = "fold"
+
 
 def get_events():
     """
@@ -168,6 +170,7 @@ def get_events():
 
     return event_list
 
+
 ################################################################################
 
 ################################################################################
@@ -178,9 +181,9 @@ def menu():
 
     while intro:
         gameDisplay.fill(white)
-        largeText = pygame.font.SysFont('Times New Roman',45)
+        largeText = pygame.font.SysFont('Times New Roman', 45)
         TextSurf, TextRect = text_objects("Card Games", largeText)
-        TextRect.center = ( (90+(60/2)), (50+(15/2)) )
+        TextRect.center = ((90 + (60 / 2)), (50 + (15 / 2)))
         gameDisplay.blit(TextSurf, TextRect)
 
         smalltext(15, str(money), 120, 5, 180, 25)
@@ -198,7 +201,6 @@ def menu():
             elif event == EventType.POKER:
                 poker()
 
-
         with game_state_lock:
             global game_state
             game_state = {
@@ -206,9 +208,10 @@ def menu():
                 "money": money,
             }
 
-       # Continue on with the rest of the menu loop
+        # Continue on with the rest of the menu loop
         pygame.display.update()
         clock.tick(15)
+
 
 ###############################################################################
 
@@ -232,7 +235,7 @@ def blackjack():
     cards = list(cardDict.keys())
     random.shuffle(cards)
 
-    print ("shuffle: ", cards)
+    print("shuffle: ", cards)
 
     dealtCards = False
 
@@ -247,9 +250,9 @@ def blackjack():
 
         gameDisplay.fill(background_colour)
 
-        largeText = pygame.font.SysFont('Times New Roman',20)
+        largeText = pygame.font.SysFont('Times New Roman', 20)
         TextSurf, TextRect = text_objects("BlackJack", largeText)
-        TextRect.center = ( (17+(60/2)), (1+(25/2)) )
+        TextRect.center = ((17 + (60 / 2)), (1 + (25 / 2)))
         gameDisplay.blit(TextSurf, TextRect)
 
         smalltext(17, "Press B to return", 33, 1, 60, 50)
@@ -283,7 +286,6 @@ def blackjack():
 
             if playerStand:
                 smalltext(15, str(cardTotalD), 75, 30, 180, 25)
-
 
         # possible events: deal, hit, stand, back
         for event in get_events():
@@ -360,7 +362,7 @@ def blackjack():
                     solveMoney = "go"
                     bet = 0
 
-        #Money
+        # Money
         if solveMoney == "go":
             if cardTotalD < cardTotalP < 22:
                 money = money + 20
@@ -375,7 +377,7 @@ def blackjack():
                 money = money + 10
                 solveMoney = "no"
 
-        with game_state_lock: # Update the shared game_state variable so that Flask can access it
+        with game_state_lock:  # Update the shared game_state variable so that Flask can access it
             global game_state
             game_state = {
                 "game": "blackjack",
@@ -395,6 +397,7 @@ def blackjack():
         pygame.display.update()
         clock.tick(15)
 
+
 ################################################################################
 
 ################################################################################
@@ -402,13 +405,16 @@ def blackjack():
 def get_rank(card):
     return card[:-1]
 
+
 def get_suit(card):
     return card[-1]
 
+
 def rank_value(rank):
-    values = {'2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8,
-              '9':9, '10':10, 'J':11, 'Q':12, 'K':13, 'A':14}
+    values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8,
+              '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
     return values.get(rank, 0)
+
 
 def evaluate_hand(cards):
     ranks = [get_rank(c) for c in cards]
@@ -424,8 +430,8 @@ def evaluate_hand(cards):
     def is_straight(vals):
         vals = sorted(set(vals), reverse=True)
         for i in range(len(vals) - 4):
-            if vals[i] - vals[i+4] == 4:
-                return True, vals[i:i+5]
+            if vals[i] - vals[i + 4] == 4:
+                return True, vals[i:i + 5]
         if set([14, 2, 3, 4, 5]).issubset(vals):  # Wheel
             return True, [5, 4, 3, 2, 14]
         return False, []
@@ -462,6 +468,7 @@ def evaluate_hand(cards):
 
     return classify_hand()
 
+
 def betting_phase(stage, playerCards, dealerCards, middleCards, cards):
     global money, pot, current_bet
     betting = True
@@ -489,9 +496,9 @@ def betting_phase(stage, playerCards, dealerCards, middleCards, cards):
             gameDisplay.blit(cardImg, (80 + xOffset, 125))
             xOffset += CARD_SIZE[0] + round(CARD_SIZE[0] * 0.5)
 
-        largeText = pygame.font.SysFont('Times New Roman',20)
+        largeText = pygame.font.SysFont('Times New Roman', 20)
         TextSurf, TextRect = text_objects("Poker", largeText)
-        TextRect.center = ( (3+(45/2)), (1+(25/2)) )
+        TextRect.center = ((3 + (45 / 2)), (1 + (25 / 2)))
         gameDisplay.blit(TextSurf, TextRect)
 
         smalltext(17, "Current Pot: ", 17, 1, 60, 50)
@@ -543,6 +550,7 @@ def betting_phase(stage, playerCards, dealerCards, middleCards, cards):
         clock.tick(15)
     return "continue"
 
+
 def poker():
     global money, pot, current_bet
     bet = 0
@@ -563,9 +571,9 @@ def poker():
 
     while not go_back:
         gameDisplay.fill(background_colour)
-        largeText = pygame.font.SysFont('Times New Roman',20)
+        largeText = pygame.font.SysFont('Times New Roman', 20)
         TextSurf, TextRect = text_objects("Poker", largeText)
-        TextRect.center = ( (3+(45/2)), (1+(25/2)) )
+        TextRect.center = ((3 + (45 / 2)), (1 + (25 / 2)))
         gameDisplay.blit(TextSurf, TextRect)
 
         smalltext(17, "Current Pot:", 17, 1, 60, 50)
@@ -594,7 +602,6 @@ def poker():
                 cardImg = pygame.image.load(cardDict[cards[cardIndex]]["image"])
                 gameDisplay.blit(cardImg, (80 + xOffset, 125))
                 xOffset += CARD_SIZE[0] + round(CARD_SIZE[0] * 0.5)
-
 
         for event in get_events():
             # Handle events
@@ -710,6 +717,7 @@ def poker():
         pygame.display.update()
         clock.tick(15)
 
+
 ################################################################################
 
 ################################################################################
@@ -719,10 +727,12 @@ def poker():
 def web_index():
     return "IT WORKS!"
 
+
 @webapp.route("/get_state")
 def get_state():
     with game_state_lock:
         return game_state
+
 
 @webapp.route("/send_command/<command>")
 def send_command(command):
@@ -745,6 +755,7 @@ def send_command(command):
             "message": f"Invalid command '{command}'. Must be one of {[e.value for e in EventType]}."
         }, 400
 
+
 @webapp.route("/debug_panel")
 def debug_panel():
     """
@@ -753,6 +764,7 @@ def debug_panel():
     """
     actions = [e.value for e in EventType]
     return render_template("debug_panel.html", actions=actions)
+
 
 ################################################################################
 
@@ -775,6 +787,7 @@ def pygame_process():
 
     menu()
     pygame.quit()
+
 
 ################################################################################
 
