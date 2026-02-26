@@ -149,24 +149,23 @@ def get_events():
             pygame.quit()
             quit()
         if event.type == pygame.KEYDOWN:
-            match event.key:
-                # Map the keys to the event types
-                case pygame.K_b:
-                    event_list.append(EventType.BACK)
-                case pygame.K_z:
-                    event_list.append(EventType.DEAL)
-                case pygame.K_h:
-                    event_list.append(EventType.HIT)
-                case pygame.K_s:
-                    event_list.append(EventType.STAND)
-                case pygame.K_c:
-                    event_list.append(EventType.CALL)
-                case pygame.K_k:
-                    event_list.append(EventType.CHECK)
-                case pygame.K_r:
-                    event_list.append(EventType.RAISE)
-                case pygame.K_f:
-                    event_list.append(EventType.FOLD)
+            # Map the keys to the event types
+            if event.key == pygame.K_b:
+                event_list.append(EventType.BACK)
+            elif event.key == pygame.K_z:
+                event_list.append(EventType.DEAL)
+            elif event.key == pygame.K_h:
+                event_list.append(EventType.HIT)
+            elif event.key == pygame.K_s:
+                event_list.append(EventType.STAND)
+            elif event.key == pygame.K_c:
+                event_list.append(EventType.CALL)
+            elif event.key == pygame.K_k:
+                event_list.append(EventType.CHECK)
+            elif event.key == pygame.K_r:
+                event_list.append(EventType.RAISE)
+            elif event.key == pygame.K_f:
+                event_list.append(EventType.FOLD)
 
     return event_list
 
